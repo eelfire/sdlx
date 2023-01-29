@@ -50,39 +50,34 @@ module ALU(
             SRA: tmpOut = A >>> B[4:0];
             ROL: tmpOut = {A[31], A[30:0]} << B[4:0];
             ROR: tmpOut = {A[0], A[31:1]} >> B[4:0];
-            SLT: tmpOut = A < B;
-            SGT: tmpOut = A > B;
-            SLE: tmpOut = A <= B;
-            SGE: tmpOut = A >= B;
+            SLT: tmpOut = case({A[31], B[31]})
+                            2'b00: A[30:0] < B[30:0];
+                            2'b01: 0;
+                            2'b10: 1;
+                            2'b11: A[30:0] > B[30:0];
+                          endcase
+            SGT: tmpOut = case({A[31], B[31]})
+                            2'b00: A[30:0] > B[30:0];
+                            2'b01: 1;
+                            2'b10: 0;
+                            2'b11: A[30:0] < B[30:0];
+                          endcase
+            SLE: tmpOut = case({A[31], B[31]})
+                            2'b00: A[30:0] <= B[30:0];
+                            2'b01: 0;
+                            2'b10: 1;
+                            2'b11: A[30:0] >= B[30:0];
+                          endcase
+            SGE: tmpOut = case({A[31], B[31]})
+                            2'b00: A[30:0] >= B[30:0];
+                            2'b01: 1;
+                            2'b10: 0;
+                            2'b11: A[30:0] <= B[30:0];
+                          endcase
             UGT: tmpOut = A > B;
             ULT: tmpOut = A < B;
             UGE: tmpOut = A >= B;
             ULE: tmpOut = A <= B;
-
-            // 5'b01000: tmpOut = A < B;
-            // 5'b01001: tmpOut = A > B;
-            // 5'b01010: tmpOut = A == B;
-            // 5'b01011: tmpOut = A != B;
-            // 5'b01100: tmpOut = A <= B;
-            // 5'b01101: tmpOut = A >= B;
-            // 5'b01110: tmpOut = A && B;
-            // 5'b01111: tmpOut = A || B;
-            // 5'b10000: tmpOut = A * B;
-            // 5'b10001: tmpOut = A / B;
-            // 5'b10010: tmpOut = A % B;
-            // 5'b10011: tmpOut = A << 1;
-            // 5'b10100: tmpOut = A >> 1;
-            // 5'b10101: tmpOut = A >>> 1;
-            // 5'b10110: tmpOut = A << 2;
-            // 5'b10111: tmpOut = A >> 2;
-            // 5'b11000: tmpOut = A >>> 2;
-            // 5'b11001: tmpOut = A << 3;
-            // 5'b11010: tmpOut = A >> 3;
-            // 5'b11011: tmpOut = A >>> 3;
-            // 5'b11100: tmpOut = A << 4;
-            // 5'b11101: tmpOut = A >> 4;
-            // 5'b11110: tmpOut = A >>> 4;
-            // 5'b11111: tmpOut = A;
             default: tmpOut = 0;
         endcase
     end
