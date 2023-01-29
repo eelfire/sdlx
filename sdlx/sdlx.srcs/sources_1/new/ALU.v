@@ -50,29 +50,29 @@ module ALU(
             SRA: tmpOut = A >>> B[4:0];
             ROL: tmpOut = {A[31], A[30:0]} << B[4:0];
             ROR: tmpOut = {A[0], A[31:1]} >> B[4:0];
-            SLT: tmpOut = case({A[31], B[31]})
-                            2'b00: A[30:0] < B[30:0];
-                            2'b01: 0;
-                            2'b10: 1;
-                            2'b11: A[30:0] > B[30:0];
+            SLT: case({A[31], B[31]})
+                            2'b00: tmpOut = A[30:0] < B[30:0];
+                            2'b01: tmpOut = 0;
+                            2'b10: tmpOut = 1;
+                            2'b11: tmpOut = A[30:0] > B[30:0];
                           endcase
-            SGT: tmpOut = case({A[31], B[31]})
-                            2'b00: A[30:0] > B[30:0];
-                            2'b01: 1;
-                            2'b10: 0;
-                            2'b11: A[30:0] < B[30:0];
+            SGT: case({A[31], B[31]})
+                            2'b00: tmpOut = A[30:0] > B[30:0];
+                            2'b01: tmpOut = 1;
+                            2'b10: tmpOut = 0;
+                            2'b11: tmpOut = A[30:0] < B[30:0];
                           endcase
-            SLE: tmpOut = case({A[31], B[31]})
-                            2'b00: A[30:0] <= B[30:0];
-                            2'b01: 0;
-                            2'b10: 1;
-                            2'b11: A[30:0] >= B[30:0];
+            SLE: case({A[31], B[31]})
+                            2'b00: tmpOut = A[30:0] <= B[30:0];
+                            2'b01: tmpOut = 0;
+                            2'b10: tmpOut = 1;
+                            2'b11: tmpOut = A[30:0] >= B[30:0];
                           endcase
-            SGE: tmpOut = case({A[31], B[31]})
-                            2'b00: A[30:0] >= B[30:0];
-                            2'b01: 1;
-                            2'b10: 0;
-                            2'b11: A[30:0] <= B[30:0];
+            SGE: case({A[31], B[31]})
+                            2'b00: tmpOut = A[30:0] >= B[30:0];
+                            2'b01: tmpOut = 1;
+                            2'b10: tmpOut = 0;
+                            2'b11: tmpOut = A[30:0] <= B[30:0];
                           endcase
             UGT: tmpOut = A > B;
             ULT: tmpOut = A < B;
