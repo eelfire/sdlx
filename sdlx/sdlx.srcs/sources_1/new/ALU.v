@@ -8,24 +8,24 @@ module ALU(
   out
 );
 
-  parameter ADD = 6'b000000;
-  parameter SUB = 6'b000001;
-  parameter AND = 6'b000010;
-  parameter OR  = 6'b000011;
-  parameter XOR = 6'b000100;
-  parameter SLL = 6'b000101;
-  parameter SRL = 6'b000110;
-  parameter SRA = 6'b000111;
-  parameter ROL = 6'b001000;
-  parameter ROR = 6'b001001;
-  parameter SLT = 6'b001010;
-  parameter SGT = 6'b001011;
-  parameter SLE = 6'b001100;
-  parameter SGE = 6'b001101;
-  parameter UGT = 6'b001110;
-  parameter ULT = 6'b001111;
-  parameter UGE = 6'b010000;
-  parameter ULE = 6'b010001;
+  parameter ADD = 6'b000001;
+  parameter SUB = 6'b000010;
+  parameter AND = 6'b000011;
+  parameter OR  = 6'b000100;
+  parameter XOR = 6'b000101;
+  parameter SLL = 6'b000110;
+  parameter SRL = 6'b000111;
+  parameter SRA = 6'b001000;
+  parameter ROL = 6'b001001;
+  parameter ROR = 6'b001010;
+  parameter SLT = 6'b001011;
+  parameter SGT = 6'b001100;
+  parameter SLE = 6'b001101;
+  parameter SGE = 6'b001110;
+  parameter UGT = 6'b001111;
+  parameter ULT = 6'b010000;
+  parameter UGE = 6'b010001;
+  parameter ULE = 6'b010010;
 
   input [31:0] A;
   input [31:0] B;
