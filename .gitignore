@@ -1,0 +1,7 @@
+# All Vivado Project Files Except Source Code
+*.cache
+*.hw
+*.ip_user_files
+*.sim
+*.jou
+*.xpr
