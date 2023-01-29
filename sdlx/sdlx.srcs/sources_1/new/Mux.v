@@ -1,15 +1,21 @@
+`timescale 1ns / 1ps
+
 module Mux (
   sel,
   A,
   B,
   out
 );
+  
+  parameter BIT_WIDTH = 6;
+  
   input sel;
   input [BIT_WIDTH-1:0] A;
   input [BIT_WIDTH-1:0] B;
   output [BIT_WIDTH-1:0] out;
   
   assign out = sel ? A : B;
+
 endmodule
 
 // module MuxParallel (

@@ -1,4 +1,6 @@
-module Reg_File (
+`timescale 1ns / 1ps
+
+module RegFile (
   clk,  // input clock
   reset,  // active high reset the regFile
   writeEnable, // Write enable
@@ -10,6 +12,7 @@ module Reg_File (
   dataOut_1,
   dataOut_2
 );
+
   input clk;
   input reset;
   input writeEnable;
@@ -22,6 +25,8 @@ module Reg_File (
   output [31:0] dataOut_2;
 
   reg [31:0] regFile [0:7];
+
+  integer i;
 
   assign dataOut_1 = regFile[regSource_1[2:0]];
   assign dataOut_2 = regFile[regSource_2[2:0]];
