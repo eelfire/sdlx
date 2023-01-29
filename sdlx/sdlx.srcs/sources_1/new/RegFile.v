@@ -2,7 +2,7 @@ module Reg_File (
   clk,  // input clock
   reset,  // active high reset the regFile
   writeEnable, // Write enable
-  enable, // Read enable
+  enable, // read enable
   regDest, // destination address
   regSource_1,  // Source address 1
   regSource_2,  // Source address 2
