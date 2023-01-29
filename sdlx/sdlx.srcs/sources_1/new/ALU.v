@@ -48,8 +48,8 @@ module ALU(
           SLL: tmpOut = A << B[4:0];
           SRL: tmpOut = A >> B[4:0];
           SRA: tmpOut = A >>> B[4:0];
-          ROL: tmpOut = {A[31], A[30:0]} << B[4:0];
-          ROR: tmpOut = {A[0], A[31:1]} >> B[4:0];
+          ROL: tmpOut = (A << B[4:0]) | (A >> (6'b100000 - B[4:0]));
+          ROR: tmpOut = (A >> B[4:0]) | (A << (6'b100000 - B[4:0]));
           SLT: case({A[31], B[31]})
                           2'b00: tmpOut = A[30:0] < B[30:0];
                           2'b01: tmpOut = 0;
