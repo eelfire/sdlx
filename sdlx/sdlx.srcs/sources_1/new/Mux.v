@@ -1,35 +1,38 @@
-module mux (
-  input sel, A, B,
-  ouput O
+module Mux (
+  sel,
+  A, 
+  B,
+  out
 );
-  assign O = sel ? A : B;
+  input sel;
+  input A;
+  input B;
+  output out;
+  
+  assign out = sel ? A : B;
+
 endmodule
 
-module mux_op (
-  input sel,
-  input [5:0] Func, Op,
-  ouput [5:0] o
+module MuxParallel (
+  sel,
+  A,
+  B,
+  out
 );
+  parameter n = 6;
+  
+  input sel;
+  input [n - 1:0] A;
+  input [n - 1:0] B;
+  output [n - 1:0] out
+
   genvar i; 
   generate
-    for (i = 0; i < 6; i = i + 1)   
+    for (i = 0; i < n; i = i + 1)   
       begin:select
-        mux stage(sel, Func[i], Op[i], o[i]);
+        Mux stage(sel, A[i], B[i], out[i]);
       end
   endgenerate
 endmodule
 
-module mux_data (
-  input sel,
-  input [31:0] X, Y,
-  ouput [31:0] Out
-);
-  genvar k; 
-  generate
-    for (k = 0; k < 31; k = k + 1)   
-      begin:select
-        mux stage(sel, X[k], Y[k], Out[k]);
-      end
-  endgenerate 
-endmodule
 
