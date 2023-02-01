@@ -25,6 +25,7 @@ module Reg_File (
 
   assign dataOut_1 = regFile[regSource_1[2:0]];
   assign dataOut_2 = regFile[regSource_2[2:0]];
+  assign regFile[0] = 32'b0;
 
   always @(posedge clk , posedge reset) begin
     if(reset) begin
