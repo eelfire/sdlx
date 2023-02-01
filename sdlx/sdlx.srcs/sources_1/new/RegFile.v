@@ -4,7 +4,6 @@ module RegFile (
   clk,  // input clock
   reset,  // active high reset the regFile
   writeEnable, // Write enable
-  enable, // read enable
   regDest, // destination address
   regSource_1,  // Source address 1
   regSource_2,  // Source address 2
@@ -12,7 +11,6 @@ module RegFile (
   dataOut_1,
   dataOut_2
 );
-
   input clk;
   input reset;
   input writeEnable;
