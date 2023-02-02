@@ -50,15 +50,15 @@ module ControlUnit (
   	regFileReset = 0;
   	regFileWriteEnable = 1;
 
-  	if(currentInstruction[31:26] == 6'b0) begin
-  		selectImmediate <= 0;
-  		selectFunctionCode <= 1;
-  		selectRegDest <= 0;
-  	end
-  	else begin
+  	if(|currentInstruction[31:26]) begin // unary OR to check if it is != 0
   		selectImmediate <= 1;
   		selectFunctionCode <= 0;
   		selectRegDest <= 1;
+  	end
+  	else begin
+  		selectImmediate <= 0;
+  		selectFunctionCode <= 1;
+  		selectRegDest <= 0;
   	end
   end
 
