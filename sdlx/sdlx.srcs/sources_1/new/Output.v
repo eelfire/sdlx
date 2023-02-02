@@ -4,7 +4,7 @@ module Output (
 	ALUOut, // output after ALU computation
 
 	/****** Outputs ******/
-	leds, // onboard leds
+	leds // onboard leds
 );
 
 	input clk;
