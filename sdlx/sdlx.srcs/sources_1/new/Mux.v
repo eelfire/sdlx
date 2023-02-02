@@ -1,13 +1,13 @@
 `timescale 1ns / 1ps
 
-module Mux (
+module Mux #(parameter BIT_WIDTH = 6)(
   sel,
   A,
   B,
   out
 );
   
-  parameter BIT_WIDTH = 6;
+//  parameter BIT_WIDTH = 6;
   
   input sel;
   input [BIT_WIDTH-1:0] A;

@@ -5,5 +5,5 @@ module SignExtension32b (
 	input [15:0] inputValue_16b;
 	output [31:0] immediateValue_32b;
 	
-	assign immediateValue_32b = {16{inputValue_16b[15]}, inputValue_16b};
+	assign immediateValue_32b = {{16{inputValue_16b[15]}}, inputValue_16b};
 endmodule

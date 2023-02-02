@@ -53,7 +53,7 @@ module Main (
   ALU alu (regFileDataOut_1, ALUOperand_2, ALUInstructionCode, carryOut, ALUOutput);
 
   // Second Operand Select for ALU
-  Mux m0 (#BIT_WIDTH = 32) (selectImmediate, instructionImmediateValue, regFileDataOut_2, ALUOperand_2);
+  Mux #(.BIT_WIDTH(32)) m0 (selectImmediate, instructionImmediateValue, regFileDataOut_2, ALUOperand_2);
 
   Output out (clk, ALUOutput, leds);
 

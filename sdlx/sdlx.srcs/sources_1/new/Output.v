@@ -18,5 +18,5 @@ module Output (
 	end
 
 	// alters b/w displaying MSB and LSB bits in ~2.7s
-	assign leds = (counter[27] == 1'b1) ? ALUOut[31:16] ? ALUOut[15:0];
+	assign leds = (counter[27] == 1'b1) ? ALUOut[31:16] : ALUOut[15:0];
 endmodule
