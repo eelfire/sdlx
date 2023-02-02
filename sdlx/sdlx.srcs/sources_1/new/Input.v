@@ -8,8 +8,8 @@ module Input (
 );
 
 	input clk;
-	input [2:0] pushButtons;
-	output [2:0] pushButtonsDebounced;
+	input [3:0] pushButtons;
+	output [3:0] pushButtonsDebounced;
 	
 	reg [23:0] counter;
     wire slowerClk;
@@ -24,6 +24,7 @@ module Input (
 	PushBtnDebounce pb0 (slowerClk, pushButtons[0], pushButtonsDebounced[0]);
 	PushBtnDebounce pb1 (slowerClk, pushButtons[1], pushButtonsDebounced[1]);
 	PushBtnDebounce pb2 (slowerClk, pushButtons[2], pushButtonsDebounced[2]);
+	PushBtnDebounce pb3 (slowerClk, pushButtons[3], pushButtonsDebounced[3]);
 	
 endmodule
 

@@ -3,7 +3,6 @@
 module Main (
 	/****** Inputs ******/
   clk,  // board clock (100 MHz)
-  reset,  // input reset
   switches,
   pushButtons,
 
@@ -12,13 +11,13 @@ module Main (
 );
 	
 	input clk;
-	input reset;
 	input [15:0] switches;
-	input [2:0] pushButtons;
+	input [3:0] pushButtons;
 	output [15:0] leds;
   
-	wire [2:0] pushButtonsDebounced;
+	wire [3:0] pushButtonsDebounced;
   wire processorClk;
+  wire globalReset;
   wire [31:0] currentInstruction;
 
   // Control Signals
@@ -39,12 +38,13 @@ module Main (
   wire carryOut;
 
   assign processorClk = pushButtonsDebounced[2];
+  assign globalReset = pushButtonsDebounced[3];
 
   Input in (clk, pushButtons, pushButtonsDebounced);
 
   InstructionRegister ir (switches, pushButtonsDebounced[0], pushButtonsDebounced[1], currentInstruction);
 
-  ControlUnit cu (currentInstruction, regFileReset, regFileWriteEnable, regDestSelect, regSourceSelect_1, regSourceSelect_2, ALUInstructionCode, selectImmediate);
+  ControlUnit cu (currentInstruction, globalReset, regFileReset, regFileWriteEnable, regDestSelect, regSourceSelect_1, regSourceSelect_2, ALUInstructionCode, selectImmediate);
 
   RegFile rf (processorClk, regFileReset, regFileWriteEnable, regDestSelect, regSourceSelect_1, regSourceSelect_2, ALUOutput, regFileDataOut_1, regFileDataOut_2);
 
