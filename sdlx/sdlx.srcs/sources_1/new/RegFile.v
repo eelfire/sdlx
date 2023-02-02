@@ -30,9 +30,9 @@ module RegFile (
 
   genvar i, j;
 
-  decoder_3x8 D1 (regSource_1[2:0], RE1);
-  decoder_3x8 D2 (regSource_2[2:0], RE2);
-  decoder_5x32 D3 (regDest, RD);
+  Decoder_3x8 D1 (regSource_1[2:0], RE1);
+  Decoder_3x8 D2 (regSource_2[2:0], RE2);
+  Decoder_5x32 D3 (regDest, RD);
 
   generate
     for (i = 0; i < 8; i = i + 1) begin
@@ -55,8 +55,8 @@ module Decoder_3x8 (
   input [2:0] in;
   output reg [7:0] out;
   
-  always @(b) begin
-    case(b)
+  always @(in) begin
+    case(in)
       3'b000 : out = 8'b00000001;
       3'b001 : out = 8'b00000010;
       3'b010 : out = 8'b00000100;
