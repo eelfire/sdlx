@@ -16,6 +16,7 @@ module ControlUnit (
 );
 
   input [31:0] currentInstruction;
+  input globalReset;
   // regFile control signals
   output regFileReset;
   output regFileWriteEnable;

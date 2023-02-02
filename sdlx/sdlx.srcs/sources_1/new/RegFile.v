@@ -14,7 +14,6 @@ module RegFile (
   input clk;
   input reset;
   input writeEnable;
-  input enable;
   input [4:0] regDest;
   input [4:0] regSource_1;
   input [4:0] regSource_2;
@@ -28,7 +27,7 @@ module RegFile (
 
   assign dataOut_1 = regFile[regSource_1[2:0]];
   assign dataOut_2 = regFile[regSource_2[2:0]];
-  assign regFile[0] = 32'b0;
+//  assign regFile[0] = 32'b0;
 
   always @(posedge clk , posedge reset) begin
     if(reset) begin
