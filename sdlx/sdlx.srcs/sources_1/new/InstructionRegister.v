@@ -11,15 +11,22 @@ module InstructionRegister (
 	input [15:0] inputHalfInstr;
 	input latchSignal_1;
 	input latchSignal_2;
-	output reg [31:0] currentInstruction;
+	output [31:0] currentInstruction;
+	reg [15:0] currentHalfInstruction_1;
+	reg [15:0] currentHalfInstruction_2;
+	
+	assign currentInstruction = {currentHalfInstruction_1, currentHalfInstruction_2};
 
-	always @(posedge latchSignal_1 or posedge latchSignal_2) begin
-		if(latchSignal_1) begin
-			currentInstruction[15:0] <= inputHalfInstr;
-		end
-		else begin
-			currentInstruction[31:16] <= inputHalfInstr;
+	always @(posedge latchSignal_1) begin
+		if (latchSignal_1) begin
+			currentHalfInstruction_1 <= inputHalfInstr;
 		end
 	end
+	
+	always @(posedge latchSignal_2) begin
+        if (latchSignal_2) begin
+            currentHalfInstruction_2 <= inputHalfInstr;
+        end
+    end
 	
 endmodule

@@ -10,16 +10,26 @@ module Input (
 	input clk;
 	input [2:0] pushButtons;
 	output [2:0] pushButtonsDebounced;
+	
+	reg [23:0] counter;
+    wire slowerClk;
+	
+	// generating a slower clock (~6 Hz)
+    always @(posedge clk) begin
+        counter <= counter + 1;
+    end
 
-	PushBtnDebounce pb0 (clk, pushButtons[0], pushButtonsDebounced[0]);
-	PushBtnDebounce pb1 (clk, pushButtons[1], pushButtonsDebounced[1]);
-	PushBtnDebounce pb2 (clk, pushButtons[2], pushButtonsDebounced[2]);
+    assign slowerClk = counter[23];
+
+	PushBtnDebounce pb0 (slowerClk, pushButtons[0], pushButtonsDebounced[0]);
+	PushBtnDebounce pb1 (slowerClk, pushButtons[1], pushButtonsDebounced[1]);
+	PushBtnDebounce pb2 (slowerClk, pushButtons[2], pushButtonsDebounced[2]);
 	
 endmodule
 
 module PushBtnDebounce (
 	/****** Inputs ******/
-	clk, // 100 MHz
+	clk, // slower clock
 	buttonSignal,
 
 	/****** Outputs ******/
@@ -29,20 +39,11 @@ module PushBtnDebounce (
 	input buttonSignal;
 	output debouncedSignal;
 
-	reg [23:0] counter;
-	wire slowerClk;
 	wire Q1;
 	wire Q2;
 
-	// generating a slower clock (~6 Hz)
-	always @(posedge clk) begin
-		counter <= counter + 1;
-	end
-
-	assign slowerClk = counter[23];
-
-	DFF d1 (slowerClk, buttonSignal, Q1);
-	DFF d2 (slowerClk, Q1, Q2);
+	DFF d1 (clk, buttonSignal, Q1);
+	DFF d2 (clk, Q1, Q2);
 
 	assign debouncedSignal = Q1 & ~Q2;
 
