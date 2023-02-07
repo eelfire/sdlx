@@ -146,8 +146,8 @@ module register_file (
 
   reg [31:0] regFile [0:31];
 
-  assign dataOut_1 = regFile[regSource_1];
-  assign dataOut_2 = regFile[regSource_2];
+  assign dataOut_1 = (regDest == 0) ? 32'b0 : regFile[regSource_1];
+  assign dataOut_2 = (regDest == 0) ? 32'b0 : regFile[regSource_2];
   wire we = (regDest == 0) ? 1'b0 : writeEnable;
 
   integer i;

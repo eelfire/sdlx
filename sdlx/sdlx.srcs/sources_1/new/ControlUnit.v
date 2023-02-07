@@ -32,7 +32,7 @@ module ControlUnit (
   assign regSourceSelect_1 = currentInstruction[25:21];
   assign regSourceSelect_2 = currentInstruction[20:16];
 
-  Mux #(.BIT_WIDTH(5)) m0 (selectRegDest, currentInstruction[20:16], currentInstruction[15:11], regDestSelect); // Destination Register Select
+  Mux #(.BIT_WIDTH(5)) m1 (selectRegDest, currentInstruction[20:16], currentInstruction[15:11], regDestSelect); // Destination Register Select
 
   // ALU Control Signals
   output [5:0] ALUInstructionCode;
@@ -45,7 +45,7 @@ module ControlUnit (
   assign operationCode = currentInstruction[31:26];
 
   // Function Code Select
-  Mux #(.BIT_WIDTH(6)) m1 (selectFunctionCode, functionCode, operationCode, ALUInstructionCode);
+  Mux #(.BIT_WIDTH(6)) m2 (selectFunctionCode, functionCode, operationCode, ALUInstructionCode);
 
   // Immediate Value Control Signals
   output reg selectImmediate;

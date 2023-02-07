@@ -1,32 +1,25 @@
 module InstructionRegister (
 	/****** Inputs ******/
-	inputHalfInstr, // 16 bit user entered data through switches
-	latchSignal_1, // signal for updating LSB bits
-	latchSignal_2, // signal for updating MSB bits
-	
+	clk, // processor clock
+	reset,
+	nextInstruction, // fetched from memory
+
 	/****** Outputs ******/
 	currentInstruction
 );
-
-	input [15:0] inputHalfInstr;
-	input latchSignal_1;
-	input latchSignal_2;
-	output [31:0] currentInstruction;
-	reg [15:0] currentHalfInstruction_1;
-	reg [15:0] currentHalfInstruction_2;
 	
-	assign currentInstruction = {currentHalfInstruction_1, currentHalfInstruction_2};
+	input clk;
+	input reset;
+	input [31:0] nextInstruction;
+	output reg [31:0] currentInstruction;
 
-	always @(posedge latchSignal_1) begin
-		if (latchSignal_1) begin
-			currentHalfInstruction_1 <= inputHalfInstr;
+	always @(posedge clk) begin
+		if(reset) begin
+			currentInstruction <= 32'b0;
+		end
+		else begin
+			currentInstruction <= nextInstruction;
 		end
 	end
-	
-	always @(posedge latchSignal_2) begin
-        if (latchSignal_2) begin
-            currentHalfInstruction_2 <= inputHalfInstr;
-        end
-    end
 	
 endmodule

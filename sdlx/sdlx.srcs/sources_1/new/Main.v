@@ -40,9 +40,9 @@ module Main (
   assign processorClk = pushButtonsDebounced[2];
   assign globalReset = pushButtonsDebounced[3];
 
-  Input in (clk, pushButtons, pushButtonsDebounced);
+  Input in (clk, switches, pushButtons, pushButtonsDebounced, userInstruction);
 
-  InstructionRegister ir (switches, pushButtonsDebounced[0], pushButtonsDebounced[1], currentInstruction);
+  InstructionRegister ir (processorClk, globalReset, userInstruction, currentInstruction);
 
   ControlUnit cu (currentInstruction, globalReset, regFileReset, regFileWriteEnable, regDestSelect, regSourceSelect_1, regSourceSelect_2, ALUInstructionCode, selectImmediate);
 
