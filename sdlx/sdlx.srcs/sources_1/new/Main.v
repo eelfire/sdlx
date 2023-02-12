@@ -15,7 +15,7 @@ module Main (
 	input [3:0] pushButtons;
 	output [15:0] leds;
   
-	wire [3:0] pushButtonsDebounced;
+  wire [3:0] pushButtonsDebounced;
   wire processorClk;
   wire globalReset;
   wire [31:0] currentInstruction;
@@ -36,6 +36,7 @@ module Main (
   wire [31:0] ALUOutput;
   wire [31:0] ALUOperand_2;
   wire carryOut;
+  wire [31:0] userInstruction;
 
   assign processorClk = pushButtonsDebounced[2];
   assign globalReset = pushButtonsDebounced[3];

@@ -119,7 +119,7 @@
 // endmodule
 
 
-module register_file (
+module RegFile (
   /****** Inputs ******/
   clk,  // input clock
   reset,  // active high reset the regFile

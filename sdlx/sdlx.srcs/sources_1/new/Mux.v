@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+// `timescale 1ns / 1ps
 
 module Mux #(parameter BIT_WIDTH = 6)(
   sel,

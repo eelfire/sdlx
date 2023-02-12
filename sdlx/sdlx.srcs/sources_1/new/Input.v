@@ -30,7 +30,7 @@ module Input (
 	PushBtnDebounce pb2 (slowerClk, pushButtons[2], pushButtonsDebounced[2]);
 	PushBtnDebounce pb3 (slowerClk, pushButtons[3], pushButtonsDebounced[3]);
 
-	ProcessUserInstruction pui (switches, pushButtonsDebounced[0], pushButtonsDebounced[1], userInstruction)
+	ProcessUserInstruction pui (switches, pushButtonsDebounced[0], pushButtonsDebounced[1], userInstruction);
 	
 endmodule
 
@@ -55,13 +55,13 @@ module ProcessUserInstruction (
 
 	always @(posedge latchSignal_1) begin
 		if (latchSignal_1) begin
-			currentHalfInstruction_1 <= inputHalfInstr;
+			currentHalfInstruction_1[15:0] <= inputHalfInstr[15:0];
 		end
 	end
 	
 	always @(posedge latchSignal_2) begin
 		if (latchSignal_2) begin
-			currentHalfInstruction_2 <= inputHalfInstr;
+			currentHalfInstruction_2[15:0] <= inputHalfInstr[15:0];
 		end
 	end
 	
