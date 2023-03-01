@@ -16,14 +16,14 @@ module ControlUnit (
   regFileReset,
   PCReset,
   regFileWriteEnable,
-  regDestSelect,
-  regSourceSelect_1,
-  regSourceSelect_2,
+  regDest,
+  regSource_1,
+  regSource_2,
   dataIn,
   ALUInstructionCode,
   ALUOperand1,
   ALUOperand2,
-  ExtnCntl,  // [0 for Extn16, 1 for Extn26]
+  ExtnCtrl,  // [0 for Extn16, 1 for Extn26]
   RDctrl,   // read data control to read data from memory
   newPC
 );
@@ -44,9 +44,9 @@ module ControlUnit (
   input [31:0] memoryOutput;
 
   output regFileWriteEnable;
-  output [4:0] regDestSelect;
-  output [4:0] regSourceSelect_1;
-  output [4:0] regSourceSelect_2;
+  output [4:0] regDest;
+  output [4:0] regSource_1;
+  output [4:0] regSource_2;
   output [31:0] Din;
 
   wire [31:0] interDin;
@@ -55,12 +55,12 @@ module ControlUnit (
   reg DinSel1;
   reg DinSel2;
 
-  assign regSourceSelect_1 = currentInstruction[20:16];
-  assign regSourceSelect_1 = currentInstruction[25:21];
+  assign regSource_1 = currentInstruction[20:16];
+  assign regSource_2 = currentInstruction[25:21];
 
   assign addedPC = currentPC + 1'b1;
 
-  Mux_3x1 #(.BIT_WIDTH(5)) m_3x1 (RDSel, currentInstruction[15:11], currentInstruction[20:16], 5'b11111, regDestSelect);
+  Mux_3x1 #(.BIT_WIDTH(5)) m_3x1 (RDSel, currentInstruction[15:11], currentInstruction[20:16], 5'b11111, regDest);
   Mux #(.BIT_WIDTH(32)) Din1 (DinSel1, ALUOutput, memoryOutput, interDin);
   Mux #(.BIT_WIDTH(32)) Din2 (DinSel2, interDin, {addedPC, 2'b00}, dataIn);
 
@@ -73,7 +73,7 @@ module ControlUnit (
   output [5:0] ALUInstructionCode;
   output [31:0] ALUOperand1;
   output [31:0] ALUOperand2;
-  output reg ExtnCntl;
+  output reg ExtnCtrl;
 
   wire [5:0] functionCode;
   wire [5:0] operationCode;
@@ -115,7 +115,7 @@ module ControlUnit (
         selectFunctionCode = 1'b0;
         Oprnd1Sel = 1'b0;
         Oprnd2Sel = 1'b0;
-        ExtnCntl = 1'bz;
+        ExtnCtrl = 1'bz;
         RDctrl = 1'b0;
         NextPC = 1'b0;
       end
@@ -142,7 +142,7 @@ module ControlUnit (
             RDctrl = 1'b0;
             regFileWriteEnable = 1'b1;
         end
-        ExtnCntl = 1'b0;
+        ExtnCtrl = 1'b0;
         NextPC = 1'b0;
       end
     end
@@ -187,7 +187,7 @@ module ControlUnit (
         DinSel1 = 1'bz;
         selectFunctionCode = 1'b1;
         Oprnd2Sel = 1'b1;
-        ExtnCntl = 1'b0;
+        ExtnCtrl = 1'b0;
         RDctrl = 1'b0;
       end
       else begin
@@ -207,7 +207,7 @@ module ControlUnit (
         selectFunctionCode = 1'b1;
         Oprnd1Sel = 1'bz;
         Oprnd2Sel = 1'b1;
-        ExtnCntl = 1'b1;
+        ExtnCtrl = 1'b1;
         RDctrl = 1'b0;
         NextPC = 1'b1;
       end
