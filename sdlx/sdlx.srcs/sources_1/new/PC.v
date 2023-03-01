@@ -13,7 +13,7 @@ module PC (
   input PCReset;
   input [29:0] newPC;
 
-  output currentPC;
+  output reg currentPC;
 
   always @(posedge clk or posedge PCReset) begin
     if (PCReset) 

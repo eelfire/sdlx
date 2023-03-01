@@ -43,11 +43,11 @@ module ControlUnit (
   input [31:0] ALUOutput;
   input [31:0] memoryOutput;
 
-  output regFileWriteEnable;
+  output reg regFileWriteEnable;
   output [4:0] regDest;
   output [4:0] regSource_1;
   output [4:0] regSource_2;
-  output [31:0] Din;
+  output [31:0] dataIn;
 
   wire [31:0] interDin;
   wire [29:0] addedPC;
@@ -94,7 +94,7 @@ module ControlUnit (
 
   reg NextPC;
 
-  Mux #(.BIT_WIDTH(29)) NextPC (NextPC, addedPC, ALUOutput[31:2], newPC);
+  Mux #(.BIT_WIDTH(29)) nextPC (NextPC, addedPC, ALUOutput[31:2], newPC);
  
   // RS1 = 0
   wire RS1is0; 
@@ -222,6 +222,7 @@ module Mux_3x1 #(parameter BIT_WIDTH = 6)(
   sel,
   A,
   B,
+  C,
   out
 );
   
@@ -233,8 +234,8 @@ module Mux_3x1 #(parameter BIT_WIDTH = 6)(
   input [BIT_WIDTH-1:0] C;
   output [BIT_WIDTH-1:0] out;
   
-  assign out = (sel = 2'b00) ? A : 1'bz;
-  assign out = (sel = 2'b01) ? B : 1'bz;
-  assign out = (sel = 2'b10) ? C : 1'bz;
+  assign out = (sel == 2'b00) ? A : 1'bz;
+  assign out = (sel == 2'b01) ? B : 1'bz;
+  assign out = (sel == 2'b10) ? C : 1'bz;
 
 endmodule
