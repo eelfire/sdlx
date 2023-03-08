@@ -1,40 +1,43 @@
-// `timescale 1ns / 1ps
+`timescale 1ns / 1ps
 
 module Mux #(parameter BIT_WIDTH = 6)(
+  /****** Inputs ******/
   sel,
   A,
   B,
+
+  /****** Outputs ******/
   out
 );
-  
-//  parameter BIT_WIDTH = 6;
-  
+
   input sel;
   input [BIT_WIDTH-1:0] A;
   input [BIT_WIDTH-1:0] B;
   output [BIT_WIDTH-1:0] out;
-  
-  assign out = sel ? A : B;
+
+  assign out = (sel == 1'b0) ? A : B;
 
 endmodule
 
-// module MuxParallel (
-//   sel,
-//   A,
-//   B,
-//   out
-// );
-//   parameter BIT_WIDTH = 6;
-  
-//   input sel;
-//   input [BIT_WIDTH-1:0] A;
-//   input [BIT_WIDTH-1:0] B;
-//   output [BIT_WIDTH-1:0] out;
+module Mux_3x1 #(parameter BIT_WIDTH = 6)(
+  /****** Inputs ******/
+  sel,
+  A,
+  B,
+  C,
 
-//   genvar i;
-//   generate
-//     for (i = 0; i < BIT_WIDTH; i = i + 1) begin:select
-//       Mux stage(sel, A[i], B[i], out[i]);
-//     end
-//   endgenerate
-// endmodule
+  /****** Outputs ******/
+  out
+);
+
+  input [1:0] sel;
+  input [BIT_WIDTH-1:0] A;
+  input [BIT_WIDTH-1:0] B;
+  input [BIT_WIDTH-1:0] C;
+  output [BIT_WIDTH-1:0] out;
+
+  assign out = (sel == 2'b00) ? A : 1'bz;
+  assign out = (sel == 2'b01) ? B : 1'bz;
+  assign out = (sel == 2'b10) ? C : 1'bz;
+
+endmodule

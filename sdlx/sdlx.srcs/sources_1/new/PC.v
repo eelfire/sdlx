@@ -2,24 +2,35 @@
 
 module PC (
   /****** Inputs ******/
-  clk,
-  PCReset,
+  clk, // processor clk
+  resetPC,
+  selectNewPC, // signal to select increment or newPC
   newPC,
 
   /****** Outputs ******/
+  incrementedPC,
   currentPC
 );
+
   input clk;
-  input PCReset;
+  input resetPC;
+  input selectNewPC; // 0 - increment, 1 - set from input data
   input [29:0] newPC;
+  output [29:0] incrementedPC;
+  output reg [29:0] currentPC;
 
-  output reg currentPC;
+  wire [29:0] nextPC;
 
-  always @(posedge clk or posedge PCReset) begin
-    if (PCReset) 
-      currentPC = 29'b0;
+  assign incrementedPC = currentPC + 1;
+
+  Mux #(.BIT_WIDTH(30)) nextPC (selectNewPC, incrementedPC, newPC, nextPC);
+
+  always @(posedge clk) begin
+    if (resetPC) begin
+      currentPC <= 30'b0;
+    end
     else begin
-      currentPC <= newPC;
+      currentPC <= nextPC;
     end
   end
 

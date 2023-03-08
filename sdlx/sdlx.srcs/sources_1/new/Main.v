@@ -1,74 +1,97 @@
 `timescale 1ns / 1ps
 
 module Main (
-    /****** Inputs ******/
-    clk,
-    switches,
-    pushButtons,
-    
-    /****** Outputs ******/
-    leds
+  /****** Inputs ******/
+  clk,
+  switches,
+  pushButtons,
+
+  /****** Outputs ******/
+  leds
 );
-    
-    input clk;
-    input [15:0] switches;
-    input [4:0] pushButtons;
-    output [15:0] leds;
 
-    wire [4:0] pushButtonsDebounced;
-    wire [31:0] userInstruction;
+  input clk;
+  input [15:0] switches;
+  input [4:0] pushButtons;
+  output [15:0] leds;
 
-    wire processorClk;
-    wire globalReset;
-    wire outputToggle;
+  // Input
+  wire [4:0] pushButtonsDebounced;
+  wire [31:0] userInstruction;
 
-    wire [31:0] dataIn;
-    wire [31:0] dataOut_1;
-    wire [31:0] dataOut_2;
-    wire carryOut;
-    wire [31:0] aluOut;
-    
-    wire regFileReset;
-    wire regFileWriteEnable;
-    wire [4:0] regDest;
-    wire [4:0] regSource_1;
-    wire [4:0] regSource_2;
-    
-    assign processorClk = pushButtonsDebounced[2];
-    assign globalReset = pushButtonsDebounced[3];
-    assign outputToggle = pushButtonsDebounced[4];
+  wire processorClk;
+  wire globalReset;
+  wire outputToggle;
+  assign processorClk = pushButtonsDebounced[2];
+  assign globalReset  = pushButtonsDebounced[3];
+  assign outputToggle = pushButtonsDebounced[4];
 
-    wire ExtnCtrl;
-    wire [15:0] Extn16;
-    wire [25:0] Extn26;
-    wire [31:0] immediateValue_32b;
+  // Control Unit
+  wire resetPC;
+  wire selectNewPC;
+  wire extensionCtrl;
+  wire regFileReset;
+  wire regFileWriteEnable;
+  wire [4:0] regFileDest;
+  wire [4:0] regFileSource_1;
+  wire [4:0] regFileSource_2;
+  wire [5:0] ALUInstructionCode;
+  wire regFileDinSel_1;
+  wire regFileDinSel_2;
+  wire oprnd1Sel;
+  wire oprnd2Sel;
+  wire memoryReadCtrl;
 
-    assign Extn16 = userInstruction[15:0];
-    assign Extn26 = userInstruction[25:0];
+  // PC
+  wire [29:0] incrementedPC;
+  wire [29:0] currentPC;
 
-    wire PCReset;
-    wire [29:0] currentPC;
-    wire [29:0] newPC;
+  // SignExtension32b
+  wire [31:0] immediateValue_32b;
 
-    wire RDctrl;
-    wire [31:0] memoryOutput;
-    
-    wire [5:0] ALUInstructionCode;
-    wire [31:0] ALUOperand1;
-    wire [31:0] ALUOperand2;
+  // RegFile
+  wire [31:0] regFileDataOut_1;
+  wire [31:0] regFileDataOut_2;
 
-    Input in(clk, switches, pushButtons, pushButtonsDebounced, userInstruction);
+  wire isRS1Zero;
+  assign isRS1Zero = (regFileDataOut_1 == 32'b0);
 
-    SignExtension32b ext(Extn16, Extn26, ExtnCtrl, immediateValue_32b);
+  // ALU
+  wire carryOut;
+  wire [31:0] ALUOut;
 
-    ControlUnit cu(processorClk, globalReset, userInstruction, aluOut, memoryOutput, dataOut_1, dataOut_2,immediateValue_32b, currentPC, regFileReset, PCReset, regFileWriteEnable, regDest, regSource_1, regSource_2, dataIn, ALUInstructionCode, ALUOperand1, ALUOperand2, ExtnCtrl, RDctrl, newPC);
+  // Muxes
+  wire [31:0] muxDataOut;
+  wire [31:0] regFileDataIn;
+  wire [31:0] ALUOperand1;
+  wire [31:0] ALUOperand2;
 
-    RegFile regFile(processorClk, regFileReset, regFileWriteEnable, regDest, regSource_1, regSource_2, dataIn, dataOut_1, dataOut_2);
+  // Memory
+  wire [31:0] memoryOut;
+  assign memoryOut = 32'b0;
 
-    PC pc(processorClk, PCReset, newPC, currentPC);
-    
-    ALU alu(ALUOperand1, ALUOperand2, ALUInstructionCode, carryOut, aluOut);
+  Input in(clk, switches, pushButtons, pushButtonsDebounced, userInstruction);
 
-    Output out(aluOut, outputToggle, leds);
-    
+  ControlUnit cu(globalReset, userInstruction, isRS1Zero, resetPC, selectNewPC, extensionCtrl, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, ALUInstructionCode, regFileDinSel_1, regFileDinSel_2, oprnd1Sel, oprnd2Sel, memoryReadCtrl);
+
+  PC pc(processorClk, resetPC, selectNewPC, ALUOut[31:2], incrementedPC, currentPC);
+
+  SignExtension32b ext(userInstruction, extensionCtrl, immediateValue_32b);
+
+  RegFile regFile(processorClk, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, regFileDataIn, regFileDataOut_1, regFileDataOut_2);
+
+  ALU alu(ALUOperand1, ALUOperand2, ALUInstructionCode, carryOut, ALUOut);
+
+  Output out(ALUOut, outputToggle, leds);
+
+  // Muxes for RegFile Inputs
+  Mux #(.BIT_WIDTH(32)) m_0 (regFileDinSel_1, ALUOut, memoryOut, muxDataOut);
+
+  Mux #(.BIT_WIDTH(32)) m_1 (regFileDinSel_2, muxDataOut, {incrementedPC, 2'b0}, regFileDataIn);
+
+  // Muxes for ALU Inputs
+  Mux #(.BIT_WIDTH(32)) m_2 (oprnd1Sel, regFileDataOut_1, {currentPC, 2'b0}, ALUOperand1);
+
+  Mux #(.BIT_WIDTH(32)) m_3 (oprnd2Sel, regFileDataOut_2, immediateValue_32b, ALUOperand2);
+
 endmodule

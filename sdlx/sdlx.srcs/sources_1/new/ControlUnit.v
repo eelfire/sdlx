@@ -2,240 +2,185 @@
 
 module ControlUnit (
   /****** Inputs ******/
-  clk,
   globalReset,
   currentInstruction,
-  ALUOutput,
-  memoryOutput,
-  dataOut_1,
-  dataOut_2,
-  immediateValue_32b,
-  currentPC,   
+  isRS1Zero,
 
   /****** Outputs ******/
+  resetPC,
+  selectNewPC, // 0 - increment, 1 - set from input data
+  extensionCtrl, // 0 - Extn16, 1 - Extn26
   regFileReset,
-  PCReset,
   regFileWriteEnable,
-  regDest,
-  regSource_1,
-  regSource_2,
-  dataIn,
+  regFileDest,
+  regFileSource_1,
+  regFileSource_2,
   ALUInstructionCode,
-  ALUOperand1,
-  ALUOperand2,
-  ExtnCtrl,  // [0 for Extn16, 1 for Extn26]
-  RDctrl,   // read data control to read data from memory
-  newPC
+  regFileDinSel_1, // 0 - ALUOut, 1 - memoryOut
+  regFileDinSel_2, // 0 - (ALU | Memory Out), 1 - Incremented PC
+  oprnd1Sel, // 0 - RS1, 1 - current PC
+  oprnd2Sel, // 0 - RS2, 1 - immediate value
+  memoryReadCtrl
 );
 
-  input clk;
   input globalReset;
   input [31:0] currentInstruction;
-
-  // Reset Signals
-  output regFileReset;
-  output PCReset;
-
-  assign regFileReset = globalReset;
-  assign PCReset = globalReset;
-
-  // RegFile
-  input [31:0] ALUOutput;
-  input [31:0] memoryOutput;
-
-  output reg regFileWriteEnable;
-  output [4:0] regDest;
-  output [4:0] regSource_1;
-  output [4:0] regSource_2;
-  output [31:0] dataIn;
-
-  wire [31:0] interDin;
-  wire [29:0] addedPC;
-  reg [1:0] RDSel;
-  reg DinSel1;
-  reg DinSel2;
-
-  assign regSource_1 = currentInstruction[20:16];
-  assign regSource_2 = currentInstruction[25:21];
-
-  assign addedPC = currentPC + 1'b1;
-
-  Mux_3x1 #(.BIT_WIDTH(5)) m_3x1 (RDSel, currentInstruction[15:11], currentInstruction[20:16], 5'b11111, regDest);
-  Mux #(.BIT_WIDTH(32)) Din1 (DinSel1, ALUOutput, memoryOutput, interDin);
-  Mux #(.BIT_WIDTH(32)) Din2 (DinSel2, interDin, {addedPC, 2'b00}, dataIn);
-
-  // ALU 
-  input [31:0] dataOut_1;
-  input [31:0] dataOut_2;
-  input [29:0] currentPC;
-  input [31:0] immediateValue_32b;
-
-  output [5:0] ALUInstructionCode;
-  output [31:0] ALUOperand1;
-  output [31:0] ALUOperand2;
-  output reg ExtnCtrl;
-
-  wire [5:0] functionCode;
+  input isRS1Zero;
   wire [5:0] operationCode;
-  reg selectFunctionCode;
-  reg Oprnd1Sel;
-  reg Oprnd2Sel;
-
-  assign functionCode = currentInstruction[5:0];
   assign operationCode = currentInstruction[31:26];
 
-  Mux #(.BIT_WIDTH(6)) ALUinstr (selectFunctionCode, functionCode, operationCode, ALUInstructionCode);
-
-  Mux #(.BIT_WIDTH(32)) Oprnd1 (Oprnd1Sel, dataOut_1, {currentPC,2'b00}, ALUOperand1);
-  Mux #(.BIT_WIDTH(32)) Oprnd2 (Oprnd2Sel, dataOut_2, immediateValue_32b, ALUOperand2);
-
   // PC
-  output [29:0] newPC;
+  output resetPC;
+  output reg selectNewPC;
 
-  reg NextPC;
+  assign resetPC = globalReset;
 
-  Mux #(.BIT_WIDTH(29)) nextPC (NextPC, addedPC, ALUOutput[31:2], newPC);
- 
-  // RS1 = 0
-  wire RS1is0; 
+  // SignExtension32b
+  output reg extensionCtrl;
 
-  assign RS1is0 = (|dataOut_1 == 1'b0);
+  // RegFile
+  output regFileReset;
+  output reg regFileWriteEnable;
+  output [4:0] regFileDest;
+  output [4:0] regFileSource_1;
+  output [4:0] regFileSource_2;
 
-  output reg RDctrl;
+  assign regFileReset = globalReset;
+  assign regFileSource_1 = currentInstruction[20:16];
+  assign regFileSource_2 = currentInstruction[25:21];
+
+  reg [1:0] regFileDestSel;
+
+  Mux_3x1 #(.BIT_WIDTH(5)) rdSel (regFileDestSel, currentInstruction[15:11], currentInstruction[20:16], 5'b11111, regFileDest);
+
+  // ALU
+  output reg [5:0] ALUInstructionCode;
+
+  // Muxes
+  output reg regFileDinSel_1;
+  output reg regFileDinSel_2;
+  output reg oprnd1Sel;
+  output reg oprnd2Sel;
+
+  // Memory
+  output reg memoryReadCtrl;
 
   // Control Signal generation
-  always @(posedge clk) begin
+  always @(currentInstruction) begin
     if (operationCode[5] ==  1'b0) begin
-      if(|operationCode) begin
+      // 1st Half Instructions
+      selectNewPC <= 1'b0;
+      extensionCtrl <= 1'b0;
+      regFileDinSel_2 <= 1'b0;
+      oprnd1Sel <= 1'b0;
+
+      if(|operationCode[4:0] == 1'b0) begin
         // R-type triadic
-        regFileWriteEnable = 1'b1;
-        RDSel = 2'b00;
-        DinSel1 = 1'b0;
-        DinSel2 = 1'b0;
-        selectFunctionCode = 1'b0;
-        Oprnd1Sel = 1'b0;
-        Oprnd2Sel = 1'b0;
-        ExtnCtrl = 1'bz;
-        RDctrl = 1'b0;
-        NextPC = 1'b0;
+        regFileWriteEnable <= 1'b1;
+        regFileDestSel <= 2'b00;
+        ALUInstructionCode <= currentInstruction[5:0];
+        oprnd2Sel <= 1'b0;
+        memoryReadCtrl <= 1'b0;
       end
       else begin
         // R-I type triadic
-        RDSel = 2'b01;
-        DinSel1 = 1'b0;
-        DinSel2 = 1'b0;
-        selectFunctionCode = 1'b1;
-        Oprnd1Sel = 1'b0;
-        Oprnd2Sel = 1'b1;
+        regFileDestSel <= 2'b01;
+        selectFunctionCode <= 1'b1;
+        oprnd2Sel <= 1'b1;
 
-        if (operationCode >= 6'd20) begin
-          if (operationCode >= 6'd49) begin
-            RDctrl = 1'b0;
-            regFileWriteEnable = 1'b1;
-          end
-          else begin
-            RDctrl = 1'b1;
-            regFileWriteEnable = 1'b0;
-          end
+        if(operationCode < 6'b010100) begin
+          // Non-memory operations
+          regFileWriteEnable <= 1'b1;
+          ALUInstructionCode <= currentInstruction[31:26];
+          memoryReadCtrl <= 1'b0;
         end
         else begin
-            RDctrl = 1'b0;
-            regFileWriteEnable = 1'b1;
+          // Memory operations
+          ALUInstructionCode = 6'b000001; // Add
+
+          if(operationCode[3] == 1'b0) begin
+            // Store Instructions
+            regFileWriteEnable <= 1'b0;
+            memoryReadCtrl <= 1'b0;
+          end
+          else begin
+            // Load Instructions
+            regFileWriteEnable <= 1'b1;
+            memoryReadCtrl <= 1'b1;
+          end
         end
-        ExtnCtrl = 1'b0;
-        NextPC = 1'b0;
       end
     end
     else begin
+      // 2nd Half Instructions
+      regFileDestSel <= 2'b10;
+      ALUInstructionCode <= 6'100000; // Add4
+      regFileDinSel_1 <= 1'b0;
+      regFileDinSel_2 <= 1'b1;
+      oprnd2Sel <= 1'b1;
+      memoryReadCtrl <= 1'b0;
+
       if(operationCode[4] == 1'b0) begin
         // R type diadic
-        // include RS1is0?
+        extensionCtrl <= 1'b0;
 
-        if (operationCode >= 5'd35) begin
-          Oprnd1Sel = 1'b0;
-          NextPC = 1'b1;
-          if(operationCode[2] == 1'b1) begin // JALR
-            regFileWriteEnable = 1'b0;
-            RDSel = 2'bzz;  
-            DinSel2 = 1'bz;
+        if (operationCode[1] == 1'b0) begin
+          // Branch Instructions
+          regFileWriteEnable <= 1'b0;
+          oprnd1Sel <= 1'b1;
+
+          if(operationCode[0] == 1'b0) begin
+            // BEQZ
+            selectNewPC <= isRS1Zero;
           end
-          else begin  // JR
-            regFileWriteEnable = 1'b1;
-            RDSel = 2'b10;
-            DinSel2 = 1'bz;
+          else begin
+            // BNEZ
+            selectNewPC <= !isRS1Zero;
           end
         end
-        else begin  // BNEZ and BEQZ
-          Oprnd1Sel = 1'b1;
-          regFileWriteEnable = 1'b0;
-          RDSel = 2'bzz;
-          DinSel2 = 1'bz;
-          
-          if (operationCode[0] == 1'b0) begin // BEQZ
-            if (RS1is0) 
-              NextPC = 1'b1;
-            else 
-              NextPC = 1'b0;
+        else begin
+          // Non-branch Instructions
+          selectNewPC <= 1'b1;
+          oprnd1Sel <= 1'b0;
+
+          if(operationCode[0] == 1'b0) begin
+            // JR
+            regFileWriteEnable <= 1'b0;
           end
-          else // BNEZ
-            if (RS1is0) 
-              NextPC = 1'b0;
-            else 
-              NextPC = 1'b1;
+          else begin
+            // JALR
+            regFileWriteEnable <= 1'b1;
+          end
         end
-        // Common Signals
-        DinSel1 = 1'bz;
-        selectFunctionCode = 1'b1;
-        Oprnd2Sel = 1'b1;
-        ExtnCtrl = 1'b0;
-        RDctrl = 1'b0;
       end
       else begin
-        // J type 
-        
-        if (operationCode[0] == 1'b0) begin  // J
-          regFileWriteEnable = 1'b0;
-          RDSel = 2'bzz;
+        // J type
+        selectNewPC <= 1'b1;
+        extensionCtrl <= 1'b1;
+        oprnd1Sel <= 1'b1;
+
+        if (operationCode[0] == 1'b0) begin
+          // J
+          regFileWriteEnable <= 1'b0;
         end
-        else begin  // JAL
-          regFileWriteEnable = 1'b1;
-          RDSel = 2'b10;
+        else begin
+          // JAL
+          regFileWriteEnable <= 1'b1;
         end
-        // common signals
-        DinSel1 = 1'bz;
-        DinSel2 = 1'b1;
-        selectFunctionCode = 1'b1;
-        Oprnd1Sel = 1'bz;
-        Oprnd2Sel = 1'b1;
-        ExtnCtrl = 1'b1;
-        RDctrl = 1'b0;
-        NextPC = 1'b1;
       end
     end
-  end  
-
-
-  
-endmodule
-
-module Mux_3x1 #(parameter BIT_WIDTH = 6)(
-  sel,
-  A,
-  B,
-  C,
-  out
-);
-  
-//  parameter BIT_WIDTH = 6;
-  
-  input [1:0] sel;
-  input [BIT_WIDTH-1:0] A;
-  input [BIT_WIDTH-1:0] B;
-  input [BIT_WIDTH-1:0] C;
-  output [BIT_WIDTH-1:0] out;
-  
-  assign out = (sel == 2'b00) ? A : 1'bz;
-  assign out = (sel == 2'b01) ? B : 1'bz;
-  assign out = (sel == 2'b10) ? C : 1'bz;
+  end
 
 endmodule
+
+//// Control Signals
+// selectNewPC = 1'b;
+// extensionCtrl = 1'b;
+// regFileWriteEnable = 1'b;
+// regFileDestSel = 1'b;
+// ALUInstructionCode = 6'b;
+// regFileDinSel_1 = 1'b;
+// regFileDinSel_2 = 1'b;
+// oprnd1Sel = 1'b;
+// oprnd2Sel = 1'b;
+// memoryReadCtrl = 1'b;

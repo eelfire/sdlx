@@ -7,3 +7,4 @@
 *.xpr
 *.runs
 **/new/*.pdf
+.DS_Store

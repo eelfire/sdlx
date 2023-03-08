@@ -1,10 +1,13 @@
 `timescale 1ns / 1ps
 
 module ALU(
+  /****** Inputs ******/
   A,
   B,
   opCode,
   carryOut,
+
+  /****** Outputs ******/
   out
 );
 
@@ -32,54 +35,54 @@ module ALU(
   input [5:0] opCode;
   output carryOut;
   output [31:0] out;
-  
+
   reg [32:0] tmpOut;
 
   assign carryOut = tmpOut[32];
   assign out = tmpOut[31:0];
 
   always @(*) begin
-      case(opCode)
-          ADD: tmpOut = A + B;
-          SUB: tmpOut = A - B;
-          AND: tmpOut = A & B;
-          OR : tmpOut = A | B;
-          XOR: tmpOut = A ^ B;
-          SLL: tmpOut = A << B[4:0];
-          SRL: tmpOut = A >> B[4:0];
-          SRA: tmpOut = A >>> B[4:0];
-          ROL: tmpOut = (A << B[4:0]) | (A >> (6'b100000 - B[4:0]));
-          ROR: tmpOut = (A >> B[4:0]) | (A << (6'b100000 - B[4:0]));
-          SLT: case({A[31], B[31]})
-                          2'b00: tmpOut = (A[30:0] < B[30:0]) ? {33{1'b1}} : 33'b0;
-                          2'b01: tmpOut = 0;
-                          2'b10: tmpOut = {33{1'b1}};
-                          2'b11: tmpOut = (A[30:0] < B[30:0]) ? {33{1'b1}} : 33'b0;
-                        endcase
-          SGT: case({A[31], B[31]})
-                          2'b00: tmpOut = (A[30:0] > B[30:0]) ? {33{1'b1}} : 33'b0;
-                          2'b01: tmpOut = {33{1'b1}};
-                          2'b10: tmpOut = 0;
-                          2'b11: tmpOut = (A[30:0] > B[30:0]) ? {33{1'b1}} : 33'b0;
-                        endcase
-          SLE: case({A[31], B[31]})
-                          2'b00: tmpOut = (A[30:0] <= B[30:0]) ? {33{1'b1}} : 33'b0;
-                          2'b01: tmpOut = 0;
-                          2'b10: tmpOut = {33{1'b1}};
-                          2'b11: tmpOut = (A[30:0] <= B[30:0]) ? {33{1'b1}} : 33'b0;
-                        endcase
-          SGE: case({A[31], B[31]})
-                          2'b00: tmpOut = (A[30:0] >= B[30:0]) ? {33{1'b1}} : 33'b0;
-                          2'b01: tmpOut = {33{1'b1}};
-                          2'b10: tmpOut = 0;
-                          2'b11: tmpOut = (A[30:0] >= B[30:0]) ? {33{1'b1}} : 33'b0;
-                        endcase
-          UGT: tmpOut = (A > B) ? {33{1'b1}} : 33'b0;
-          ULT: tmpOut = (A < B) ? {33{1'b1}} : 33'b0;
-          UGE: tmpOut = (A >= B) ? {33{1'b1}} : 33'b0;
-          ULE: tmpOut = (A <= B) ? {33{1'b1}} : 33'b0;
-          default: tmpOut = 0;
+    case(opCode)
+      ADD: tmpOut = A + B;
+      SUB: tmpOut = A - B;
+      AND: tmpOut = A & B;
+      OR : tmpOut = A | B;
+      XOR: tmpOut = A ^ B;
+      SLL: tmpOut = A << B[4:0];
+      SRL: tmpOut = A >> B[4:0];
+      SRA: tmpOut = A >>> B[4:0];
+      ROL: tmpOut = (A << B[4:0]) | (A >> (6'b100000 - B[4:0]));
+      ROR: tmpOut = (A >> B[4:0]) | (A << (6'b100000 - B[4:0]));
+      SLT: case({A[31], B[31]})
+        2'b00: tmpOut = (A[30:0] < B[30:0]) ? {33{1'b1}} : 33'b0;
+        2'b01: tmpOut = 0;
+        2'b10: tmpOut = {33{1'b1}};
+        2'b11: tmpOut = (A[30:0] < B[30:0]) ? {33{1'b1}} : 33'b0;
       endcase
+      SGT: case({A[31], B[31]})
+        2'b00: tmpOut = (A[30:0] > B[30:0]) ? {33{1'b1}} : 33'b0;
+        2'b01: tmpOut = {33{1'b1}};
+        2'b10: tmpOut = 0;
+        2'b11: tmpOut = (A[30:0] > B[30:0]) ? {33{1'b1}} : 33'b0;
+      endcase
+      SLE: case({A[31], B[31]})
+        2'b00: tmpOut = (A[30:0] <= B[30:0]) ? {33{1'b1}} : 33'b0;
+        2'b01: tmpOut = 0;
+        2'b10: tmpOut = {33{1'b1}};
+        2'b11: tmpOut = (A[30:0] <= B[30:0]) ? {33{1'b1}} : 33'b0;
+      endcase
+      SGE: case({A[31], B[31]})
+        2'b00: tmpOut = (A[30:0] >= B[30:0]) ? {33{1'b1}} : 33'b0;
+        2'b01: tmpOut = {33{1'b1}};
+        2'b10: tmpOut = 0;
+        2'b11: tmpOut = (A[30:0] >= B[30:0]) ? {33{1'b1}} : 33'b0;
+      endcase
+      UGT: tmpOut = (A > B)  ? {33{1'b1}} : 33'b0;
+      ULT: tmpOut = (A < B)  ? {33{1'b1}} : 33'b0;
+      UGE: tmpOut = (A >= B) ? {33{1'b1}} : 33'b0;
+      ULE: tmpOut = (A <= B) ? {33{1'b1}} : 33'b0;
+      default: tmpOut = 0;
+    endcase
   end
 
 endmodule
