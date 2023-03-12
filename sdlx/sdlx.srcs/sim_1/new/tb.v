@@ -89,6 +89,7 @@ module tb();
     currentInstruction = 32'b110000_0000000000000000000000001; #10;    // J 1
 
     globalReset = 1; #10;
+    globalReset = 0; #10;
     currentInstruction = 32'b100011_00001_00000_0000000000000010; #10;    // JALR R1, 2
     currentInstruction = 32'b000001_11111_00010_0000000000000000; #10;    // ADDI R31, R2, 0
 
