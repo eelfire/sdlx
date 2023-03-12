@@ -35,7 +35,7 @@ module RegFile (
   always @(posedge clk, posedge reset) begin
     if(reset) begin
       for (i = 0; i < 32; i = i + 1) begin
-        regFile[i] <= 32'b0;
+        regFile[i] <= i;
       end
     end
     else begin

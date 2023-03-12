@@ -85,7 +85,7 @@ module ControlUnit (
       else begin
         // R-I type triadic
         regFileDestSel <= 2'b01;
-        selectFunctionCode <= 1'b1;
+        // selectFunctionCode <= 1'b1;
         oprnd2Sel <= 1'b1;
 
         if(operationCode < 6'b010100) begin
@@ -96,7 +96,7 @@ module ControlUnit (
         end
         else begin
           // Memory operations
-          ALUInstructionCode = 6'b000001; // Add
+          ALUInstructionCode <= 6'b000001; // Add
 
           if(operationCode[3] == 1'b0) begin
             // Store Instructions
@@ -114,7 +114,7 @@ module ControlUnit (
     else begin
       // 2nd Half Instructions
       regFileDestSel <= 2'b10;
-      ALUInstructionCode <= 6'100000; // Add4
+      ALUInstructionCode <= 6'b100000; // Add4
       regFileDinSel_1 <= 1'b0;
       regFileDinSel_2 <= 1'b1;
       oprnd2Sel <= 1'b1;

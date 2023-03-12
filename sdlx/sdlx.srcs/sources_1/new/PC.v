@@ -23,7 +23,7 @@ module PC (
 
   assign incrementedPC = currentPC + 1;
 
-  Mux #(.BIT_WIDTH(30)) nextPC (selectNewPC, incrementedPC, newPC, nextPC);
+  Mux #(.BIT_WIDTH(30)) nxtPC (selectNewPC, incrementedPC, newPC, nextPC);
 
   always @(posedge clk) begin
     if (resetPC) begin

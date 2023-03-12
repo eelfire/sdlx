@@ -34,10 +34,15 @@ module Mux_3x1 #(parameter BIT_WIDTH = 6)(
   input [BIT_WIDTH-1:0] A;
   input [BIT_WIDTH-1:0] B;
   input [BIT_WIDTH-1:0] C;
-  output [BIT_WIDTH-1:0] out;
+  output reg [BIT_WIDTH-1:0] out;
 
-  assign out = (sel == 2'b00) ? A : 1'bz;
-  assign out = (sel == 2'b01) ? B : 1'bz;
-  assign out = (sel == 2'b10) ? C : 1'bz;
+  always @ (*) begin
+    case (sel)
+      2'b00: out = A;
+      2'b01: out = B;
+      2'b10: out = C;
+      default: out = 1'bz;
+    endcase
+  end
 
 endmodule
