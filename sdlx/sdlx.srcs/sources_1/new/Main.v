@@ -45,6 +45,8 @@ module Main (
   // PC
   wire [29:0] incrementedPC;
   wire [29:0] currentPC;
+  wire [29:0] ALUOutPC;
+  assign ALUOutPC = ALUOut[31:2];
 
   // SignExtension32b
   wire [31:0] immediateValue_32b;
@@ -74,7 +76,7 @@ module Main (
 
   ControlUnit cu(globalReset, userInstruction, isRS1Zero, resetPC, selectNewPC, extensionCtrl, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, ALUInstructionCode, regFileDinSel_1, regFileDinSel_2, oprnd1Sel, oprnd2Sel, memoryReadCtrl);
 
-  PC pc(processorClk, resetPC, selectNewPC, ALUOut[31:2], incrementedPC, currentPC);
+  PC pc(processorClk, resetPC, selectNewPC, ALUOutPC, incrementedPC, currentPC);
 
   SignExtension32b ext(userInstruction, extensionCtrl, immediateValue_32b);
 
@@ -87,10 +89,10 @@ module Main (
   // Muxes for RegFile Inputs
   Mux #(.BIT_WIDTH(32)) m_0 (regFileDinSel_1, ALUOut, memoryOut, muxDataOut);
 
-  Mux #(.BIT_WIDTH(32)) m_1 (regFileDinSel_2, muxDataOut, {incrementedPC, 2'b0}, regFileDataIn);
+  Mux #(.BIT_WIDTH(32)) m_1 (regFileDinSel_2, muxDataOut, {incrementedPC, 2'b00}, regFileDataIn);
 
   // Muxes for ALU Inputs
-  Mux #(.BIT_WIDTH(32)) m_2 (oprnd1Sel, regFileDataOut_1, {currentPC, 2'b0}, ALUOperand1);
+  Mux #(.BIT_WIDTH(32)) m_2 (oprnd1Sel, regFileDataOut_1, {currentPC, 2'b00}, ALUOperand1);
 
   Mux #(.BIT_WIDTH(32)) m_3 (oprnd2Sel, regFileDataOut_2, immediateValue_32b, ALUOperand2);
 

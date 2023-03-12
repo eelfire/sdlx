@@ -25,7 +25,7 @@ module PC (
 
   Mux #(.BIT_WIDTH(30)) nxtPC (selectNewPC, incrementedPC, newPC, nextPC);
 
-  always @(posedge clk) begin
+  always @(posedge clk or posedge resetPC) begin
     if (resetPC) begin
       currentPC <= 30'b0;
     end

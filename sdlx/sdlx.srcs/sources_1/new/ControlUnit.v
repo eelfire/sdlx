@@ -76,7 +76,7 @@ module ControlUnit (
 
       if(|operationCode[4:0] == 1'b0) begin
         // R-type triadic
-        regFileDinSel_1 = 1'b0;
+        regFileDinSel_1 <= 1'b0;
         regFileWriteEnable <= 1'b1;
         regFileDestSel <= 2'b00;
         ALUInstructionCode <= currentInstruction[5:0];
@@ -91,7 +91,7 @@ module ControlUnit (
 
         if(operationCode < 6'b010100) begin
           // Non-memory operations
-          regFileDinSel_1 = 1'b0;
+          regFileDinSel_1 <= 1'b0;
           regFileWriteEnable <= 1'b1;
           ALUInstructionCode <= currentInstruction[31:26];
           memoryReadCtrl <= 1'b0;
@@ -102,13 +102,13 @@ module ControlUnit (
 
           if(operationCode[3] == 1'b0) begin
             // Store Instructions
-            regFileDinSel_1 = 1'b0;
+            regFileDinSel_1 <= 1'b0;
             regFileWriteEnable <= 1'b0;
             memoryReadCtrl <= 1'b0;
           end
           else begin
             // Load Instructions
-            regFileDinSel_1 = 1'b1;
+            regFileDinSel_1 <= 1'b1;
             regFileWriteEnable <= 1'b1;
             memoryReadCtrl <= 1'b1;
           end
