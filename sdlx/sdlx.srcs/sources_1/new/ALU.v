@@ -29,6 +29,7 @@ module ALU(
   parameter ULT = 6'b010000;
   parameter UGE = 6'b010001;
   parameter ULE = 6'b010010;
+  parameter ADD4= 6'b100000;
 
   input [31:0] A;
   input [31:0] B;
@@ -81,6 +82,7 @@ module ALU(
       ULT: tmpOut = (A < B)  ? {33{1'b1}} : 33'b0;
       UGE: tmpOut = (A >= B) ? {33{1'b1}} : 33'b0;
       ULE: tmpOut = (A <= B) ? {33{1'b1}} : 33'b0;
+      ADD4:tmpOut = A + {B[29:0], 2'b00};
       default: tmpOut = 0;
     endcase
   end
