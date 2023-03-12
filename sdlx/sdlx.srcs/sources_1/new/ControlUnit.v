@@ -46,8 +46,8 @@ module ControlUnit (
   output [4:0] regFileSource_2;
 
   assign regFileReset = globalReset;
-  assign regFileSource_1 = currentInstruction[20:16];
-  assign regFileSource_2 = currentInstruction[25:21];
+  assign regFileSource_1 = currentInstruction[25:21];
+  assign regFileSource_2 = currentInstruction[20:16];
 
   reg [1:0] regFileDestSel;
 
