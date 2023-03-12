@@ -71,18 +71,26 @@ module tb();
     #10;
     
     // R type triadic
-    currentInstruction = 32'b000000_00001_00101_00010_00000_000001; #10;    // ADD R1,R5,R2
-    currentInstruction = 32'b000000_00001_00010_00011_00000_000001; #10;    // ADD R1,R2,R3
+    currentInstruction = 32'b000000_00001_00101_00010_00000_000001; #10;    // ADD R1, R5, R2
+    currentInstruction = 32'b000000_00001_00010_00011_00000_000001; #10;    // ADD R1, R2, R3
 
     // R-I type triadic
-    currentInstruction = 32'b001011_10100_10110_0000000000111100; #10;    // ADDI R20,R22,60
-    currentInstruction = 32'b000101_10110_00001_1111111111111100; #10;    // XORI R22,R1,65532
+    currentInstruction = 32'b001011_10100_10110_0000000000111100; #10;    // ADDI R20, R22, 60
+    currentInstruction = 32'b000101_10110_00001_1111111111111100; #10;    // XORI R22, R1 , 65532
+
 
     // R type diadic
-    currentInstruction = 32'b100000_10100_00000_0000000000000010; #10;    // LB R20,2(R0)
+    currentInstruction = 32'b100000_00000_00000_0000000000000010; #10;    // BEQZ R0, 2
+    currentInstruction = 32'b100001_00000_00000_0000000000000010; #10;    // BNEZ R0, 2
+    currentInstruction = 32'b100010_00001_00000_0000000000000010; #10;    // JR   R1, 2
+    currentInstruction = 32'b100011_00001_00000_0000000000000010; #10;    // JALR R1, 2 
 
     // J type
     currentInstruction = 32'b110000_0000000000000000000000001; #10;    // J 1
+
+    globalReset = 1; #10;
+    currentInstruction = 32'b100011_00001_00000_0000000000000010; #10;    // JALR R1, 2
+    currentInstruction = 32'b000001_11111_00010_0000000000000000; #10;    // ADDI R31, R2, 0
 
     $finish;
   end
