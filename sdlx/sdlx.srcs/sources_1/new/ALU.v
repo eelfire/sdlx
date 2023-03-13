@@ -11,25 +11,26 @@ module ALU(
   out
 );
 
-  parameter ADD  = 6'b000001;
-  parameter SUB  = 6'b000010;
-  parameter AND  = 6'b000011;
-  parameter OR   = 6'b000100;
-  parameter XOR  = 6'b000101;
-  parameter SLL  = 6'b000110;
-  parameter SRL  = 6'b000111;
-  parameter SRA  = 6'b001000;
-  parameter ROL  = 6'b001001;
-  parameter ROR  = 6'b001010;
-  parameter SLT  = 6'b001011;
-  parameter SGT  = 6'b001100;
-  parameter SLE  = 6'b001101;
-  parameter SGE  = 6'b001110;
-  parameter UGT  = 6'b001111;
-  parameter ULT  = 6'b010000;
-  parameter UGE  = 6'b010001;
-  parameter ULE  = 6'b010010;
-  parameter ADD4 = 6'b100000;
+  parameter ADD = 6'b000001;
+  parameter SUB = 6'b000010;
+  parameter AND = 6'b000011;
+  parameter ORR = 6'b000100;
+  parameter XOR = 6'b000101;
+  parameter SLL = 6'b000110;
+  parameter SRL = 6'b000111;
+  parameter SRA = 6'b001000;
+  parameter ROL = 6'b001001;
+  parameter ROR = 6'b001010;
+  parameter SLT = 6'b001011;
+  parameter SGT = 6'b001100;
+  parameter SLE = 6'b001101;
+  parameter SGE = 6'b001110;
+  parameter UGT = 6'b001111;
+  parameter ULT = 6'b010000;
+  parameter UGE = 6'b010001;
+  parameter ULE = 6'b010010;
+  parameter DMX = 6'b010011;
+  parameter AD4 = 6'b100000;
 
   input [31:0] A;
   input [31:0] B;
@@ -82,7 +83,8 @@ module ALU(
       ULT: tmpOut = (A < B)  ? {33{1'b1}} : 33'b0;
       UGE: tmpOut = (A >= B) ? {33{1'b1}} : 33'b0;
       ULE: tmpOut = (A <= B) ? {33{1'b1}} : 33'b0;
-      ADD4:tmpOut = (A + {B[29:0], 2'b00});
+      DMX: tmpOut = {1'b0, B[15:0], A[15:0]};
+      AD4: tmpOut = (A + {B[29:0], 2'b00});
       default: tmpOut = 0;
     endcase
   end
