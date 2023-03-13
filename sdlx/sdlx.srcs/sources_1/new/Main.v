@@ -45,8 +45,6 @@ module Main (
   // PC
   wire [29:0] incrementedPC;
   wire [29:0] currentPC;
-  wire [29:0] ALUOutPC;
-  assign ALUOutPC = ALUOut[31:2];
 
   // SignExtension32b
   wire [31:0] immediateValue_32b;
@@ -61,6 +59,8 @@ module Main (
   // ALU
   wire carryOut;
   wire [31:0] ALUOut;
+  wire [29:0] ALUOutPC;
+  assign ALUOutPC = ALUOut[31:2];
 
   // Muxes
   wire [31:0] muxDataOut;

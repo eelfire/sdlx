@@ -36,7 +36,7 @@ module Mux_3x1 #(parameter BIT_WIDTH = 6)(
   input [BIT_WIDTH-1:0] C;
   output reg [BIT_WIDTH-1:0] out;
 
-  always @ (*) begin
+  always @(sel) begin
     case (sel)
       2'b00: out = A;
       2'b01: out = B;
