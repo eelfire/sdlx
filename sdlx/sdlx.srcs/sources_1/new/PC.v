@@ -23,9 +23,9 @@ module PC (
 
   assign incrementedPC = currentPC + 1;
 
-  Mux #(.BIT_WIDTH(30)) nxtPC (selectNewPC, incrementedPC, newPC, nextPC);
+  Mux #(.BIT_WIDTH(30)) nxtPC(selectNewPC, incrementedPC, newPC, nextPC);
 
-  always @(posedge clk or posedge resetPC) begin
+  always @(posedge clk, posedge resetPC) begin
     if (resetPC) begin
       currentPC <= 30'b0;
     end
