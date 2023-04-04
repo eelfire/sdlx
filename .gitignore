@@ -6,5 +6,10 @@
 *.jou
 *.xpr
 *.runs
+*.gen
 **/new/*.pdf
 .DS_Store
+*.log
+*.aux
+*.synctex.gz
+*.toc
