@@ -23,8 +23,8 @@ module DataConvert (
       case({ signExtend, dataSize[0] })
         2'b00: dataOut <= {24'b0, memoryOut[7:0]};
         2'b01: dataOut <= {16'b0, memoryOut[15:0]};
-        2'b10: dataOut <= {24{memoryOut[7]}, memoryOut[7:0]};
-        2'b11: dataOut <= {16{memoryOut[15]}, memoryOut[15:0]};
+        2'b10: dataOut <= {{24{memoryOut[7]}}, memoryOut[7:0]};
+        2'b11: dataOut <= {{16{memoryOut[15]}}, memoryOut[15:0]};
       endcase
     end
   end

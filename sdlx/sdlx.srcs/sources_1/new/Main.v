@@ -91,7 +91,7 @@ module Main (
   PC pc(processorClk, resetPC, selectNewPC, ALUOutPC, incrementedPC, currentPC);
 
   // Port A - Instructions, Port B - Data
-  Memory mem(
+  RAM_wrapper mem(
     .BRAM_PORTA_0_addr({ currentPC, 2'b00 }),
     .BRAM_PORTA_0_clk(clk),
     .BRAM_PORTA_0_din(32'b0),
