@@ -3,27 +3,28 @@
 module Main (
   /****** Inputs ******/
   clk,
-  switches,
+  // switches,
   pushButtons,
 
   /****** Outputs ******/
-  leds
+  leds,
+  segments,
+  digitEn
 );
 
   input clk;
-  input [15:0] switches;
+  // input [15:0] switches;
   input [4:0] pushButtons;
   output [15:0] leds;
+  output [7:0] segments;
+  output [3:0] digitEn;
 
   // Input
   wire [4:0] pushButtonsDebounced;
 
-  wire processorClk;
-  wire globalReset;
-  wire outputToggle;
-  assign processorClk = pushButtonsDebounced[2];
-  assign globalReset  = pushButtonsDebounced[3];
-  assign outputToggle = pushButtonsDebounced[4];
+  wire processorClk = pushButtonsDebounced[2];
+  wire globalReset = pushButtonsDebounced[3];
+  wire outputToggle = pushButtonsDebounced[4];
 
   // PC
   wire [29:0] incrementedPC;
@@ -69,16 +70,17 @@ module Main (
   wire [31:0] regFileDataOut_1;
   wire [31:0] regFileDataOut_2;
 
-  wire isRS1Zero;
-  assign isRS1Zero = (regFileDataOut_1 == 32'b0);
+  wire isRS1Zero = (regFileDataOut_1 == 32'b0);
 
   // ALU
   wire carryOut;
   wire [31:0] ALUOut;
-  wire [29:0] ALUOutPC;
-  wire [1:0] laneControl;
-  assign ALUOutPC = ALUOut[31:2];
-  assign laneControl = ALUOut[1:0];
+  
+  wire [29:0] ALUOutPC = ALUOut[31:2];
+  wire [1:0] laneControl = ALUOut[1:0];
+
+  // IO_Device
+  wire [13:0] IODeviceOut;
 
   // Muxes
   wire [31:0] muxDataOut;
@@ -90,23 +92,28 @@ module Main (
 
   PC pc(processorClk, resetPC, selectNewPC, ALUOutPC, incrementedPC, currentPC);
 
+  // Address Decoder for RAM
+  wire [31:0] addressBus = ALUOut;
+  wire [31:0] dataInBus = regFileDataOut_2;
+  wire ramEnable = ~addressBus[31];
+
   // Port A - Instructions, Port B - Data
-  RAM_wrapper mem(
+  ram_wrapper mem(
     .BRAM_PORTA_0_addr({ currentPC, 2'b00 }),
     .BRAM_PORTA_0_clk(clk),
     .BRAM_PORTA_0_din(32'b0),
     .BRAM_PORTA_0_dout(nextInstruction),
     .BRAM_PORTA_0_en(1'b1),
     .BRAM_PORTA_0_we(4'b0),
-    .BRAM_PORTB_0_addr(ALUOut),
+    .BRAM_PORTB_0_addr(addressBus),
     .BRAM_PORTB_0_clk(clk),
     .BRAM_PORTB_0_din(alignedMemDataIn),
     .BRAM_PORTB_0_dout(memoryOut),
-    .BRAM_PORTB_0_en(1'b1),
+    .BRAM_PORTB_0_en(ramEnable),
     .BRAM_PORTB_0_we(memoryRWCtrl)
   );
 
-  MemLaneSwitch mls(laneControl, regFileDataOut_2, memoryOut, alignedMemDataIn, alignedMemDataOut);
+  MemLaneSwitch mls(laneControl, dataInBus, memoryOut, alignedMemDataIn, alignedMemDataOut);
 
   DataConvert dconvt(memDataSignExtCntrl, memDataFetchSize, alignedMemDataOut, convertedMemDataOut);
 
@@ -119,6 +126,8 @@ module Main (
   RegFile regFile(processorClk, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, regFileDataIn, regFileDataOut_1, regFileDataOut_2);
 
   ALU alu(ALUOperand1, ALUOperand2, ALUInstructionCode, carryOut, ALUOut);
+
+  IODevice io(clk, addressBus, dataInBus, segments, digitEn);
 
   Output out(ALUOut, outputToggle, leds);
 
