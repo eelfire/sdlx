@@ -1,0 +1,21 @@
+ADDI $R1, $R0, mem1
+ADDI $R5, $R0, 0x4338
+LHI $R5, $R5, 0X8005
+LW $R2, $R1, 0
+ADDI $R3, $R0, N
+loop: ADDI $R1, $R1, 4
+LW $R4, $R1, 0
+JAL max
+NOP
+next: SUBI $R3, $R3, 1
+BEQZ $R3, done
+NOP
+J loop
+NOP
+done: SW $R2, $R5, 0
+max: SGT $R6, $R4, $R2
+BEQZ $R6, next
+NOP
+ADDI $R2, $R4, 0
+JR $R31, 0
+NOP

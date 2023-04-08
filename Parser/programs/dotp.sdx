@@ -1,0 +1,23 @@
+ADDI $R1, $R0, mem1
+ADDI $R2, $R0, mem2
+ADDI $R7, $R0, 0x4338
+LHI $R7, $R7, 0X8005
+ADD $R3, $R0, $R0
+ADDI $R4, $R0, 10
+loop: LW $R5, $R1, 0
+LW $R6, $R2, 0
+ADDI $R1, $R1, 4
+ADDI $R2, $R2, 4
+ADDI $R4, $R4, -1
+mul: ADD $R9, $R0, $R0
+BEQZ $R5, mul_done
+NOP
+ADD $R9, $R6, $R9
+ADD $R5, $R5, -1
+J mul
+NOP
+mul_done: ADD $R3, $R9, $R3
+BNEZ $R4, loop
+NOP
+SW $R3, $R7, 0
+HLTs
