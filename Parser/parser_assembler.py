@@ -10,8 +10,8 @@ NOP for no operation
 
 from helper_parser import *
 
-inp_file = open(r'/Users/shetty/IIT Gandhinagar/Semester 4/COA/sdlx/sdlx/Parser/inp.txt', "r")
-op_file = open(r'/Users/shetty/IIT Gandhinagar/Semester 4/COA/sdlx/sdlx/Parser/op.txt', "w+")
+inp_file = open('input.txt', "r")
+op_file = open('op.txt', "w+")
 
 assembly_codes = inp_file.readline()
 i = 1
@@ -26,7 +26,7 @@ inp_file.close()
 op_file.close()
 
 op_file = open(
-  r'/Users/shetty/IIT Gandhinagar/Semester 4/COA/sdlx/sdlx/Parser/op.txt', "r+")
+  'op.txt', "r+")
 
 instr_data = op_file.readlines()
 for line_num, code in Flagged_lines.items():
@@ -35,5 +35,5 @@ for line_num, code in Flagged_lines.items():
 
 op_file.close()
 
-with open(r'/Users/shetty/IIT Gandhinagar/Semester 4/COA/sdlx/sdlx/Parser/op.txt', "w") as op_file:
+with open('op.txt', "w") as op_file:
   op_file.writelines(instr_data)

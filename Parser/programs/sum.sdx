@@ -1,8 +1,8 @@
-ADDI $R1, $R0, mem1
+ADDI $R1, $R0, 60
 ADDI $R5, $R0, 0x4338
 LHI $R5, $R5, 0X8005
 ADDI $R2, $R0, 0
-ADDI $R3, $R0, N
+ADDI $R3, $R0, 20
 loop: BEQZ $R3, done
 NOP
 LW $R4, $R1, 0
@@ -12,3 +12,4 @@ SUBI $R3, $R3, 1
 J loop
 NOP
 done: SW $R2, $R5, 0
+HLT

@@ -81,7 +81,7 @@ def to_bin(y, num):
   elif y[:2] == "0b":
     return y[2:].zfill(num)
   elif y[:2] == "0x":
-    return "{0:08b}".format(int(y[-1][2:], 16)).zfill(num)
+    return "{0:08b}".format(int(y[2:-1], 16)).zfill(num)
   else: 
     return bin(int(y)).replace("0b", "").zfill(num)
     
