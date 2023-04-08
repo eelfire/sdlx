@@ -89,9 +89,9 @@ def to_bin(y, num):
 
 def code_gen(x, line_num):
   if len(x) == 1:
-    if x[0] == "NOP":
+    if x[0].upper() == "NOP":
       return "0"*31 + "1"
-    elif x[0] == "HLT":
+    elif x[0].upper() == "HLT":
       return opcode_directory[x[0]] + "0"*26
   
   if x[0][-1] == ':':
