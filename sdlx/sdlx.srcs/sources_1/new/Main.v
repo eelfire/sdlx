@@ -2,7 +2,7 @@
 
 module Main (
   /****** Inputs ******/
-  clk,
+  i_clk,
   // switches,
   pushButtons,
 
@@ -12,7 +12,7 @@ module Main (
   digitEn
 );
 
-  input clk;
+  input i_clk;
   // input [15:0] switches;
   input [4:0] pushButtons;
   output [15:0] leds;
@@ -42,6 +42,7 @@ module Main (
   wire [31:0] convertedMemDataOut;
 
   // Control Unit
+  wire clkEnable;
   wire resetPC;
   wire selectNewPC;
   wire [3:0] memoryRWCtrl;
@@ -59,6 +60,8 @@ module Main (
   wire regFileDinSel_2;
   wire oprnd1Sel;
   wire oprnd2Sel;
+
+  wire clk = (clkEnable == 1'b1) ? i_clk : 1'b0;
 
   // Instruction Register
   wire [31:0] currentInstruction;
@@ -90,7 +93,7 @@ module Main (
 
   Input in(clk, pushButtons, pushButtonsDebounced);
 
-  PC pc(processorClk, resetPC, selectNewPC, ALUOutPC, incrementedPC, currentPC);
+  PC pc(clk, resetPC, selectNewPC, ALUOutPC, incrementedPC, currentPC);
 
   // Address Decoder for RAM
   wire [31:0] addressBus = ALUOut;
@@ -117,13 +120,13 @@ module Main (
 
   DataConvert dconvt(memDataSignExtCntrl, memDataFetchSize, alignedMemDataOut, convertedMemDataOut);
 
-  InstructionRegister ir(processorClk, resetIR, nextInstruction, currentInstruction);
+  InstructionRegister ir(clk, resetIR, nextInstruction, currentInstruction);
 
-  ControlUnit cu(globalReset, currentInstruction, isRS1Zero, laneControl, resetPC, selectNewPC, memoryRWCtrl, memDataSignExtCntrl, memDataFetchSize, resetIR, extensionCtrl, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, ALUInstructionCode, regFileDinSel_1, regFileDinSel_2, oprnd1Sel, oprnd2Sel);
+  ControlUnit cu(globalReset, currentInstruction, isRS1Zero, laneControl, clkEnable, resetPC, selectNewPC, memoryRWCtrl, memDataSignExtCntrl, memDataFetchSize, resetIR, extensionCtrl, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, ALUInstructionCode, regFileDinSel_1, regFileDinSel_2, oprnd1Sel, oprnd2Sel);
 
   SignExtension32b ext(currentInstruction, extensionCtrl, immediateValue_32b);
 
-  RegFile regFile(processorClk, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, regFileDataIn, regFileDataOut_1, regFileDataOut_2);
+  RegFile regFile(clk, regFileReset, regFileWriteEnable, regFileDest, regFileSource_1, regFileSource_2, regFileDataIn, regFileDataOut_1, regFileDataOut_2);
 
   ALU alu(ALUOperand1, ALUOperand2, ALUInstructionCode, carryOut, ALUOut);
 

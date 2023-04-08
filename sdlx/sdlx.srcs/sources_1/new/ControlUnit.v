@@ -8,6 +8,7 @@ module ControlUnit (
   laneControl,
 
   /****** Outputs ******/
+  clkEnable,
   resetPC,
   selectNewPC, // 0 - increment, 1 - set from input data
   memoryRWCtrl,
@@ -33,6 +34,9 @@ module ControlUnit (
   input [1:0] laneControl;
   wire [5:0] operationCode;
   assign operationCode = currentInstruction[31:26];
+
+  // Clock
+  output clkEnable;
 
   // PC
   output resetPC;
@@ -86,6 +90,7 @@ module ControlUnit (
   always @(currentInstruction) begin
     if (operationCode[5] ==  1'b0) begin
       // 1st Half Instructions
+      clkEnable = 1'b1;
       selectNewPC <= 1'b0;
       extensionCtrl <= 1'b0;
       regFileDinSel_2 <= 1'b0;
@@ -150,6 +155,7 @@ module ControlUnit (
 
       if(operationCode[4] == 1'b0) begin
         // R type diadic
+        clkEnable = 1'b1;
         extensionCtrl <= 1'b0;
 
         if (operationCode[1] == 1'b0) begin
@@ -182,18 +188,26 @@ module ControlUnit (
         end
       end
       else begin
-        // J type
+        // J type & Misc
         selectNewPC <= 1'b1;
         extensionCtrl <= 1'b1;
         oprnd1Sel <= 1'b1;
 
         if (operationCode[0] == 1'b0) begin
           // J
+          clkEnable = 1'b1;
           regFileWriteEnable <= 1'b0;
         end
         else begin
-          // JAL
-          regFileWriteEnable <= 1'b1;
+          if(operationCode[1] == 1'b1) begin
+            // HLT
+            clkEnable = 1'b0;
+          end
+          else begin
+            // JAL
+            clkEnable = 1'b1;
+            regFileWriteEnable <= 1'b1;
+          end
         end
       end
     end
@@ -202,13 +216,16 @@ module ControlUnit (
 endmodule
 
 //// Control Signals
+// clkEnable = 1'b;
 // selectNewPC = 1'b;
+// memoryRWCtrl = 4'b;
+// memDataSignExtCntrl = 1'b;
+// memDataFetchSize = 2'b;
 // extensionCtrl = 1'b;
 // regFileWriteEnable = 1'b;
-// regFileDestSel = 1'b;
+// regFileDestSel = 2'b;
 // ALUInstructionCode = 6'b;
 // regFileDinSel_1 = 1'b;
 // regFileDinSel_2 = 1'b;
 // oprnd1Sel = 1'b;
 // oprnd2Sel = 1'b;
-// memoryRWCtrl = 1'b;
