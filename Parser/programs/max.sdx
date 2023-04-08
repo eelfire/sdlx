@@ -12,11 +12,11 @@ BEQZ $R3, done
 NOP
 J loop
 NOP
-done: SW $R2, $R5, 0
 max: SGT $R6, $R4, $R2
 BEQZ $R6, next
 NOP
 ADDI $R2, $R4, 0
 JR $R31, 0
 NOP
+done: SW $R2, $R5, 0
 HLT
